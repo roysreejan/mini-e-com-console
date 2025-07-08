@@ -1,5 +1,4 @@
 import api from "./api";
-
 export interface Product {
   _id: string;
   title: string;

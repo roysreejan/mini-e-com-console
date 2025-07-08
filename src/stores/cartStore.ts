@@ -1,15 +1,15 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { Product } from "../lib/productService";
-
+import api from "../lib/api";
 export interface CartItem {
   product: Product;
   quantity: number;
 }
-
 interface CartStore {
   items: CartItem[];
   isOpen: boolean;
+  isCheckoutOpen: boolean;
   totalItems: number;
   totalPrice: number;
   addItem: (product: Product) => void;
@@ -21,6 +21,9 @@ interface CartStore {
   toggleCart: () => void;
   openCart: () => void;
   closeCart: () => void;
+  openCheckout: () => void;
+  closeCheckout: () => void;
+  hydrateProducts: () => Promise<void>;
 }
 
 const calculateTotals = (items: CartItem[]) => {
@@ -34,9 +37,10 @@ const calculateTotals = (items: CartItem[]) => {
 
 export const useCartStore = create<CartStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       items: [],
       isOpen: false,
+      isCheckoutOpen: false,
       totalItems: 0,
       totalPrice: 0,
 
@@ -144,11 +148,59 @@ export const useCartStore = create<CartStore>()(
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
+
+      openCheckout: () => set({ isCheckoutOpen: true }),
+      closeCheckout: () => set({ isCheckoutOpen: false }),
+
+      hydrateProducts: async () => {
+        const { items } = get();
+        if (items.length === 0) return;
+
+        try {
+          // Fetch all products in cart
+          const productIds = items.map((item) => item.product._id);
+          const { data } = await api.post("/products/batch", {
+            ids: productIds,
+          });
+          const freshProducts = data?.data?.products || [];
+
+          set((state) => {
+            const newItems = state.items
+              .map((item) => {
+                const updatedProduct: Product | undefined = freshProducts.find(
+                  (p: Product) => p._id === item.product._id
+                );
+                return updatedProduct
+                  ? { ...item, product: updatedProduct }
+                  : item;
+              })
+              .filter((item) => item.product); // Remove items with missing products
+
+            return {
+              items: newItems,
+              ...calculateTotals(newItems),
+            };
+          });
+        } catch (error) {
+          console.error("Failed to hydrate cart products:", error);
+        }
+      },
     }),
     {
-      name: "cart-storage-v1",
+      name: "cart-storage",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({
+        items: state.items,
+        totalItems: state.totalItems,
+        totalPrice: state.totalPrice,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          const { totalItems, totalPrice } = calculateTotals(state.items);
+          state.totalItems = totalItems;
+          state.totalPrice = totalPrice;
+        }
+      },
     }
   )
 );
