@@ -4,9 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface ProductDetailProps {
-  params: {
-    id: string;
-  };
+  params: { id: string };
 }
 
 export default async function ProductDetail({ params }: ProductDetailProps) {
