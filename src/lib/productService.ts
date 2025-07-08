@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 export interface Product {
   _id: string;
@@ -10,7 +10,7 @@ export interface Product {
 }
 
 export const getProducts = async (): Promise<Product[]> => {
-  const response = await api.get('/products');
+  const response = await api.get("/products");
   return response.data;
 };
 
