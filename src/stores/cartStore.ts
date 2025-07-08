@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Product, getProducts, getProductById } from "../lib/productService";
+import { Product, getProducts } from "../lib/productService";
 
 export interface CartItem {
   product: Product;
