@@ -4,13 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from 'next/navigation';
 
-interface ProductDetailPageProps {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+  searchParams?: {
+    [key: string]: string | string[] | undefined;
+  };
 }
 
-export default async function ProductDetail({ params }: ProductDetailPageProps) {
-  const product = await getProductById(params.id);
+export default async function ProductDetail({ params }: PageProps) {
+  // Await params here
+  const { id } = await params;
+
+  const product = await getProductById(id);
 
   if (!product) {
     notFound();
