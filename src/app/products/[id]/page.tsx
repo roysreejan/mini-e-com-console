@@ -2,27 +2,18 @@ import { getProductById } from "@/lib/productService";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from 'next/navigation';
 
-interface ProductDetailProps {
+interface ProductDetailPageProps {
   params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default async function ProductDetail({ params }: ProductDetailProps) {
+export default async function ProductDetail({ params }: ProductDetailPageProps) {
   const product = await getProductById(params.id);
 
   if (!product) {
-    return (
-      <main className="max-w-7xl mx-auto px-4 py-16">
-        <h1 className="text-2xl font-bold text-red-600">Product Not Found</h1>
-        <p className="text-gray-700 mt-4">We couldn&apos;t find the product you&apos;re looking for.</p>
-        <Link
-          href="/products"
-          className="mt-6 inline-block bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
-        >
-          Go back to Products
-        </Link>
-      </main>
-    );
+    notFound();
   }
 
   return (
