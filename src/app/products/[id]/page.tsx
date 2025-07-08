@@ -3,13 +3,14 @@ import { AddToCartButton } from "@/components/AddToCartButton";
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function ProductDetail({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
-  const product = await getProductById(id);
+interface ProductDetailProps {
+  params: {
+    id: string;
+  };
+}
+
+export default async function ProductDetail({ params }: ProductDetailProps) {
+  const product = await getProductById(params.id);
 
   if (!product) {
     return (
@@ -29,7 +30,6 @@ export default async function ProductDetail({
   return (
     <main className="max-w-7xl mx-auto px-4 py-16">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-        {/* Product Image */}
         <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-xl border border-gray-200 bg-gradient-to-br from-white to-gray-100">
           <Image
             src={product.image}
@@ -41,7 +41,6 @@ export default async function ProductDetail({
           />
         </div>
 
-        {/* Product Info */}
         <div className="flex flex-col justify-between gap-6">
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
