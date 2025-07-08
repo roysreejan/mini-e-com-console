@@ -1,17 +1,19 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Product } from "../lib/productService";
-import api from "../lib/api";
+import { Product, getProducts, getProductById } from "../lib/productService";
+
 export interface CartItem {
   product: Product;
   quantity: number;
 }
+
 interface CartStore {
   items: CartItem[];
   isOpen: boolean;
   isCheckoutOpen: boolean;
   totalItems: number;
   totalPrice: number;
+  isHydrating: boolean;
   addItem: (product: Product) => void;
   removeItem: (productId: string) => void;
   increaseQuantity: (productId: string) => void;
@@ -43,6 +45,7 @@ export const useCartStore = create<CartStore>()(
       isCheckoutOpen: false,
       totalItems: 0,
       totalPrice: 0,
+      isHydrating: false,
 
       addItem: (product) => {
         if (product.stock <= 0) return;
@@ -157,18 +160,16 @@ export const useCartStore = create<CartStore>()(
         if (items.length === 0) return;
 
         try {
-          // Fetch all products in cart
-          const productIds = items.map((item) => item.product._id);
-          const { data } = await api.post("/products/batch", {
-            ids: productIds,
-          });
-          const freshProducts = data?.data?.products || [];
+          set({ isHydrating: true });
+
+          // Option 1: Fetch all products and match them (better for small product catalogs)
+          const allProducts = await getProducts();
 
           set((state) => {
             const newItems = state.items
               .map((item) => {
-                const updatedProduct: Product | undefined = freshProducts.find(
-                  (p: Product) => p._id === item.product._id
+                const updatedProduct = allProducts.find(
+                  (p) => p._id === item.product._id
                 );
                 return updatedProduct
                   ? { ...item, product: updatedProduct }
@@ -183,6 +184,8 @@ export const useCartStore = create<CartStore>()(
           });
         } catch (error) {
           console.error("Failed to hydrate cart products:", error);
+        } finally {
+          set({ isHydrating: false });
         }
       },
     }),

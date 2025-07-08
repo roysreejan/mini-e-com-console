@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import Navbar from "@/components/Navbar";
-import CartSidebar from "@/components/CartSidebar";
-import CartHydrater from "@/components/CartHydrater";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import Navbar from '@/components/Navbar';
+import CartSidebar from '@/components/CartSidebar';
+import CartHydrater from '@/components/CartHydrater';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Mini E-Commerce",
-  description: "A simple e-commerce application",
+  title: 'Mini E-Commerce',
+  description: 'A simple e-commerce application',
 };
 
 export default function RootLayout({
@@ -24,7 +24,9 @@ export default function RootLayout({
           <CartHydrater />
           <Navbar />
           <CartSidebar />
-          <main className="container mx-auto px-4 py-8">{children}</main>
+          <main className="container mx-auto px-4 py-8">
+            {children}
+          </main>
         </div>
       </body>
     </html>

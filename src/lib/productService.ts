@@ -18,12 +18,12 @@ export const getProducts = async (): Promise<Product[]> => {
   }
 };
 
-export const getProductById = async (id: string): Promise<Product> => {
+export const getProductById = async (id: string): Promise<Product | null> => {
   try {
     const { data } = await api.get(`/products/${id}`);
-    return data?.data?.product;
+    return data?.data?.product ?? null;
   } catch (error) {
-    console.error("Failed to fetch product:", error);
-    throw error;
+    console.error(`Failed to fetch product ${id}:`, error);
+    return null;
   }
 };
