@@ -6,10 +6,25 @@ import Link from "next/link";
 export default async function ProductDetail({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
   const product = await getProductById(id);
+
+  if (!product) {
+    return (
+      <main className="max-w-7xl mx-auto px-4 py-16">
+        <h1 className="text-2xl font-bold text-red-600">Product Not Found</h1>
+        <p className="text-gray-700 mt-4">We couldn&apos;t find the product you&apos;re looking for.</p>
+        <Link
+          href="/products"
+          className="mt-6 inline-block bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
+        >
+          Go back to Products
+        </Link>
+      </main>
+    );
+  }
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-16">
