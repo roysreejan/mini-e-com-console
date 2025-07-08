@@ -1,20 +1,23 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { ShoppingCart } from 'lucide-react';
-import { useCartStore } from '../stores/cartStore';
-import type { Product } from '../lib/productService';
+import Link from "next/link";
+import Image from "next/image";
+import { ShoppingCart } from "lucide-react";
+import { useCartStore } from "../stores/cartStore";
+import type { Product } from "../lib/productService";
 
 interface ProductCardProps {
   product: Product;
 }
 
+const BLUR_PLACEHOLDER =
+  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9IiNlZWUiIG9wYWNpdHk9IjAuMyIvPjwvc3ZnPg==";
+
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addItem } = useCartStore();
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigation when clicking add to cart
+    e.preventDefault();
     e.stopPropagation();
     addItem(product);
   };
@@ -22,7 +25,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link
       href={`/products/${product._id}`}
-      className="group relative block overflow-hidden rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
+      className="group relative block w-full sm:w-[200px] max-w-full overflow-hidden rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
       aria-label={`View ${product.title}`}
     >
       <div className="relative aspect-square w-full">
@@ -30,8 +33,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
           src={product.image}
           alt={product.title}
           fill
+          placeholder="blur"
+          blurDataURL={BLUR_PLACEHOLDER}
           className="object-cover transition-opacity group-hover:opacity-90"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes="(max-width: 640px) 100vw, 200px"
           priority={false}
         />
         {product.stock <= 0 && (
@@ -45,16 +50,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <h3 className="text-lg font-medium text-gray-900 line-clamp-2 mb-1">
           {product.title}
         </h3>
-        
+
         <div className="flex items-center justify-between mt-2">
           <div>
             <p className="text-lg font-bold text-gray-900">
               ${product.price.toFixed(2)}
             </p>
             {product.stock > 0 && (
-              <p className="text-xs text-gray-500">
-                {product.stock} in stock
-              </p>
+              <p className="text-xs text-gray-500">{product.stock} in stock</p>
             )}
           </div>
 
