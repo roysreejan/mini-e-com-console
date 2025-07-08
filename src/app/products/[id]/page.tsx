@@ -3,19 +3,16 @@ import { AddToCartButton } from "@/components/AddToCartButton";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from 'next/navigation';
-
-interface PageProps {
-  params: Promise<{
-    id: string;
-  }>;
-  searchParams?: {
-    [key: string]: string | string[] | undefined;
-  };
+interface Props {
+  params: Promise<{ id: string }>;
 }
 
-export default async function ProductDetail({ params }: PageProps) {
-  // Await params here
+export default async function ProductDetail({ params }: Props) {
   const { id } = await params;
+
+  if (!id) {
+    notFound();
+  }
 
   const product = await getProductById(id);
 
