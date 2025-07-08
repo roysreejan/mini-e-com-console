@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { Product } from '../lib/productService';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { Product } from "../lib/productService";
 
-interface CartItem {
+export interface CartItem {
   product: Product;
   quantity: number;
 }
@@ -26,7 +26,7 @@ interface CartStore {
 const calculateTotals = (items: CartItem[]) => {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce(
-    (sum, item) => sum + (item.product.price * item.quantity),
+    (sum, item) => sum + item.product.price * item.quantity,
     0
   );
   return { totalItems, totalPrice };
@@ -42,7 +42,7 @@ export const useCartStore = create<CartStore>()(
 
       addItem: (product) => {
         if (product.stock <= 0) return;
-        
+
         set((state) => {
           const existingItemIndex = state.items.findIndex(
             (item) => item.product._id === product._id
@@ -80,9 +80,11 @@ export const useCartStore = create<CartStore>()(
 
       increaseQuantity: (productId) => {
         set((state) => {
-          const item = state.items.find(item => item.product._id === productId);
+          const item = state.items.find(
+            (item) => item.product._id === productId
+          );
           if (!item || item.quantity >= item.product.stock) return state;
-          
+
           const newItems = state.items.map((item) =>
             item.product._id === productId
               ? { ...item, quantity: item.quantity + 1 }
@@ -114,12 +116,14 @@ export const useCartStore = create<CartStore>()(
 
       updateQuantity: (productId, quantity) => {
         set((state) => {
-          const product = state.items.find(item => item.product._id === productId)?.product;
+          const product = state.items.find(
+            (item) => item.product._id === productId
+          )?.product;
           const validQuantity = Math.min(
             Math.max(1, quantity),
             product?.stock || quantity
           );
-          
+
           const newItems = state.items
             .map((item) =>
               item.product._id === productId
@@ -142,7 +146,7 @@ export const useCartStore = create<CartStore>()(
       closeCart: () => set({ isOpen: false }),
     }),
     {
-      name: 'cart-storage-v1',
+      name: "cart-storage-v1",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ items: state.items }),
     }
