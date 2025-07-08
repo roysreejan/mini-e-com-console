@@ -67,7 +67,7 @@ mini-e-com-console/
 ## Deployment
 
 This project is configured for deployment on [Vercel](https://vercel.com). The `vercel.json` file ensures that all routes are rewritten to `index.html` for a single-page application.
-The live project is available at: `https://`
+The live project is available at: `https://mini-e-com-console.vercel.app/`
 
 To deploy:
 
